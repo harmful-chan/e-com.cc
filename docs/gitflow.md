@@ -60,6 +60,25 @@ Git Flow 是一种功能强大的 Git 工作流程，适用于大型项目。其
     ```
    这会将 `feature/new-feature` 分支合并回 `develop` 分支，并删除 `feature/new-feature` 分支。
 
+#### 查看代码更新
+
+1. **检测文件变化**
+    ```bash
+    git checkout feature/new-feature
+    git diff origin/develop
+    ```
+    查看当前文件与当前分支最新commit有什么区别。
+    
+2. **拉取develop最新代码并rebase自己分支**
+   ```bash
+   git checkout develop
+   git pull origin
+   git checkout feature/new-feature
+   git rebase develop
+   ### ... 解决冲突
+   git commit -m "xxx"
+   ```
+
 #### 准备发布
 
 1. **创建发布分支**：
