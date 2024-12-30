@@ -1,0 +1,14 @@
+localhost {
+    log {
+        output stdout
+    } 
+    tls   /etc/caddy/cert/localhost+2.pem /etc/caddy/cert/localhost+2-key.pem
+    handle_path  /bot/wechat/* {
+        reverse_proxy http://localhost:3001
+    }
+
+    reverse_proxy /api/* localhost:3001
+    reverse_proxy /registry/* localhost:5000
+    encode gzip
+
+}

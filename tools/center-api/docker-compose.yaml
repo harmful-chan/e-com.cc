@@ -1,0 +1,13 @@
+
+
+services:
+  load-demo:
+    network_mode: "host"
+    image: center-api  
+    build: 
+      context: ../../center-api
+      dockerfile: Dockerfile
+    volumes:
+      - ../../center-api/demo/demo.config.mjs:/app/demo/demo.config.mjs
+      - ../../center-api/demo/load-demo.mjs:/app/demo/load-demo.mjs
+    command: ['node', '/app/demo/load-demo.mjs']

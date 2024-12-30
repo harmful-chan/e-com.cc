@@ -1,0 +1,76 @@
+
+
+services:
+  db-nosql:
+    image: mongo:latest
+    # 当 docker 服务启动后，自动启动 mongodb 容器
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      # 初始化一个 root 角色的用户 root 密码是 root
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=admin
+    volumes:
+      - ${STORAGE}/db-nosql:/data/db
+    # 增加启动参数，--auth，表示连接 mongodb 需要用户名和密码
+    command:
+      - "--auth"
+    healthcheck:
+      test: ["CMD", "curl", '-f', 'http://localhost:27017/']
+      interval: 5s
+      timeout: 10s
+      retries: 30
+  db:
+    image: postgres:alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - LANG=C.UTF-8
+    volumes:
+      - ${STORAGE}/db/data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "curl", '-f', 'http://localhost:5432/']
+      interval: 5s
+      timeout: 10s
+      retries: 30
+
+  redis:  
+    hostname: redis
+    image: redis:7.0.4
+    restart: always
+    environment:
+      - REDIS_DATABASES=1
+      - REDIS_PORT=redis
+      - REDIS_PASSWORD=redis
+      - TZ=Asia/Shanghai
+    volumes:
+      - ${STORAGE}/redis/data:/root/redis
+      - ${STORAGE}/redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+        - "6379:6379"
+    healthcheck:
+      test: ["CMD", "curl", '-fs', 'http://localhost:6379/']
+      interval: 5s
+      timeout: 10s
+      retries: 30
+
+  rabbit:
+    image: "rabbitmq:3-management"
+    environment:
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "rabbitmq"
+      # RABBITMQ_DEFAULT_VHOST: "/"
+      # RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+    # volumes:
+      # - "${STORAGE}/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins"
+      #- "./rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro"
+      #- "./autocluster-0.4.1.ez:/usr/lib/rabbitmq/lib/rabbitmq_server-3.5.5/plugins/autocluster-0.4.1.ez"

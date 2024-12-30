@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:postgres@localhost:5432/e-com"
+}
+
+
+model Role {
+  id BigInt @id @default(autoincrement())
+  name String @unique
+
+  User User[]
+
+
+  createdAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+
+  @@map("t_role")
+}
+
+model Permission {
+  id       BigInt   @id  @default(autoincrement()) 
+  name  String @unique
+
+  users User[]  
+
+  createdAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+
+  @@map("t_permission")
+  
+}
+
+
+model User {
+  id        BigInt   @id  @default(autoincrement()) 
+  email String
+  userIdentity String @map("user_identity")
+  password  String
+
+  isRegister Boolean @map("is_register")
+
+  roleId BigInt  
+  role Role @relation(fields: [roleId], references: [id])
+  permissions Permission[] 
+  
+
+  createdAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+
+  @@map("t_user")
+  Session Session[]
+}
+
+
+
+
+
+model Session {
+  id        BigInt   @id  @default(autoincrement()) 
+  userId    BigInt  
+  user      User     @relation(fields: [userId], references: [id])
+  token     String
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+
+  @@map("t_session")
+}
+
+
+model Register {
+  id                BigInt @id  @default(autoincrement()) 
+  createdAt          DateTime @default(now()) @map("create_at")
+  updateAt          DateTime @updatedAt @map("update_at")
+  email             String
+  code              String
+  expiresAt        DateTime @map("expires_at")
+  isVerify Boolean @map("is_verify")
+  isSend Boolean @map("is_send")
+  subject String 
+  templateName String @map("template_name")
+  from String 
+  to String 
+  @@map("t_register")
+}
+
+
+
+
+model EmailSendLog {
+  id        Int      @id @default(autoincrement())
+  token     String   
+  createdAt DateTime @default(now())
+
+  @@map("t_email_send_log")
+}
+

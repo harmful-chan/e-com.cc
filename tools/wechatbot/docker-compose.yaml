@@ -1,0 +1,16 @@
+version: '3'
+services:
+  wechatbot:
+    image: dannicool/docker-wechatbot-webhook
+    container_name: wechatbot
+    ports:
+      - 3001:3001
+    volumes:
+      - wechatbot_data:/app/log
+    restart: unless-stopped
+    environment:
+      # RECVD_MSG_API: ${WECHATBOT_CALLBACK_URL}
+      ACCEPT_RECVD_MSG_MYSELF: true
+      LOGIN_API_TOKEN: ${WECHATBOT_LOGIN_API_TOKEN}
+volumes:
+  wechatbot_data:

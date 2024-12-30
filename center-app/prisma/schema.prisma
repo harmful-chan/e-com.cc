@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:postgres@localhost:5432/e-com"
+}
+
+
+model Role {
+  id BigInt @id @default(autoincrement())
+  name String @unique
+
+  User User[]
+
+
+  createdAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+
+  @@map("t_role")
+}
+
+model Permission {
+  id       Int   @id  @default(autoincrement()) 
+  name  String @unique
+
+  users User[]  
+
+  createdAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+
+  @@map("t_permission")
+  
+}
+
+
+model User {
+  id        BigInt   @id  @default(autoincrement()) 
+  email     String   @unique
+  emailVerified Boolean @default(false) @map("email_verified")
+  username String
+  password  String
+  phoneCountryCode String
+  phoneNumber String
+
+  roleId BigInt  
+  role Role @relation(fields: [roleId], references: [id])
+  
+
+  permissions Permission[] 
+  
+  createdAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+
+  @@map("t_user")
+  Session Session[]
+}
+
+
+
+
+
+model Session {
+  id        BigInt   @id  @default(autoincrement()) 
+  userId    BigInt  
+  user      User     @relation(fields: [userId], references: [id])
+  token     String
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+
+  @@map("t_session")
+}
+
+
+model EmailVertify {
+  id BigInt @id @default(autoincrement())
+  emailAddress String
+  code String
+  isVertify Boolean
+  emailTemplateName String 
+
+  expiresAt DateTime  @db.Timestamp(3) @map("expires_at")
+  createdAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+
+    @@map("t_email_vertify")
+}
