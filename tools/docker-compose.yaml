@@ -1,6 +1,41 @@
 
 
 services:
+  app:
+    image: app:$APP_VERSION
+    env_file:
+      - ../api/.env
+      - ../ui/.env
+    build: 
+      dockerfile: dockerfile
+      context: ..
+      args:
+        - version=$APP_VERSION
+
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/cert:/etc/caddy/cert
+      - ${STORAGE}/caddy/data:/data
+      - ${STORAGE}/caddy/config:/config
+    restart: always
+
+
+  load-demo:
+    network_mode: "host"
+    image: app:$APP_VERSION
+    volumes:
+      - ../api/demo/demo.config.mjs:/app/api/demo/demo.config.mjs
+      - ../api/demo/load-demo.mjs:/app/api/demo/load-demo.mjs
+    command: ['node', '/app/api/demo/load-demo.mjs']
+
+
   db-nosql:
     image: mongo:latest
     # 当 docker 服务启动后，自动启动 mongodb 容器
